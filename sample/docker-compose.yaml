@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  builder:
+    image: flutter-sample-builder
+    build: .
+    environment:
+      # - ENV REPO_KEY=/root/ssh_key
+      - REPO_URL=git@github.com:test/test.git
+      - REPO_BRANCH=master
+    volumes:
+      - ./apk:/root/apk:rw
