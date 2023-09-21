@@ -13,8 +13,9 @@ usage() {
 	echo "" 1>&2
 	echo "  Set following environment variables:" 1>&2
 	echo "  REPO_URL          (Required) Repository URL" 1>&2
-	echo "  REPO_KEY          (Optional) Repository SSH key" 1>&2
 	echo "  REPO_BRANCH       (Optional) Repository Branch" 1>&2
+	echo "  COMMIT_SHA        (Optional) SHA of commit to checkout" 1>&2
+	echo "  SSH_KEY           (Optional) Repository SSH key" 1>&2
 	exit 1
 }
 
@@ -45,8 +46,8 @@ else
 fi
 
 # Repo key
-if [ -n "${REPO_KEY}" ]; then
-	key=$(realpath $REPO_KEY)
+if [ -n "${SSH_KEY}" ]; then
+	key=$(realpath $SSH_KEY)
 fi
 
 # Branch argument
@@ -55,6 +56,13 @@ if [ -n "${REPO_BRANCH}" ]; then
 	branch_arg="-b $branch --single-branch"
 else
 	branch_arg=""
+fi
+
+# Branch argument
+if [ -n "${COMMIT_SHA}" ]; then
+	commit=$COMMIT_SHA
+else
+	commit=""
 fi
 
 # Create path to dir
@@ -66,6 +74,8 @@ fi
 #####
 
 if [ -n "${key}" ]; then
+	echo "Git will use $key SSH key."
+
 	export GIT_SSH_COMMAND="ssh -i $key -o IdentitiesOnly=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" 
 fi
 
@@ -76,22 +86,34 @@ clean() {
 
 pull() {
 	clean || exit 1
-	if [ -n "${branch}" ]; then
-		git checkout -f $branch || exit 1
+	if [ -z "${commit}" ]; then
+		if [ -n "${branch}" ]; then
+			git checkout --recurse-submodules -f $branch || exit 1
+		fi
+		git pull || exit 1
+	else
+		git fetch --depth 1 origin $commit || exit 1
+		git checkout --recurse-submodules FETCH_HEAD || exit 1
 	fi
-	git pull || exit 1
+}
+
+pull_dir() {
+	pushd $directory || exit 1
+	pull || exit 1
+	popd || exit 1
 }
 
 clone() {
-	git clone --recurse-submodules $branch_arg $repo_url $directory || exit 1
+	if [ -n "${commit}" ]; then
+		git clone --depth 1 --recurse-submodules --no-checkout $repo_url $directory || exit 1
+		pull_dir
+	else
+		git clone --depth 1 --recurse-submodules $branch_arg $repo_url $directory || exit 1
+	fi
 }
 
 if [ -d $directory ]; then
-	{( set -e
-		pushd $directory
-		pull
-		popd
-	)} || {
+	pull_dir || {
 		rm -rf $directory
 		echo "Failed to update repo, attempting to clone from a scratch" 1>&2
 		clone
