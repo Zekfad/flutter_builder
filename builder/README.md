@@ -6,7 +6,7 @@ Docker image for building Android flutter apps.
 
 This image contains following development kits:
 
-* Flutter SDK (3.13.4)
+* Flutter SDK (3.13.5 - September 20, 2023)
 * JDK 11 (Adoptium Temurin)
 * Android SDK:
   * Android SDK Platform 34
