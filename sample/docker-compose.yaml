@@ -5,8 +5,10 @@ services:
     image: flutter-sample-builder
     build: .
     environment:
-      # - ENV REPO_KEY=/root/ssh_key
       - REPO_URL=git@github.com:test/test.git
-      - REPO_BRANCH=master
+      # - REPO_BRANCH=master
+      - SSH_KEY=/root/ssh_key
+      # - COMMIT_SHA=a94a8fe5ccb19ba61c4c0873d391e987982fbbd3
     volumes:
       - ./apk:/root/apk:rw
+      - ./ssh_key:/root/ssh_key:ro

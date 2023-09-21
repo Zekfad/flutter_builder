@@ -15,14 +15,14 @@ COPY ./scripts /root/scripts
 
 RUN chmod -R +x /root/scripts/*
 
-COPY ./ssh_key /root/ssh_key
-RUN chmod 400 -R /root/ssh_key
-
-ENV REPO_KEY=/root/ssh_key
+# ENV REPO_KEY=/root/ssh_key
 # ENV REPO_URL=git@github.com/test/test.git
 # ENV REPO_BRANCH=master
 
-CMD /root/scripts/pull-repo.sh /root/repo \
+SHELL [ "/bin/bash", "-c" ]
+CMD source /root/scripts/fix-ssh-key-perms.sh \
+	&& /root/scripts/pull-repo.sh /root/repo \
+	&& source /root/scripts/fix-ssh-key-perms.sh remove-copy \
 	&& cd /root/repo \
 	&& flutter build apk \
 	&& cp -r build/app/outputs/flutter-apk/* /root/apk/

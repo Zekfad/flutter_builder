@@ -2,14 +2,12 @@
 
 Sample Flutter builder based on `zekfad/flutter-builder`.
 
-This sample show how can you use this image to build Android APK from private
-git repository by pulling it via SSH (with key) and building via Flutter SDK.
+In this example container will pull/clone repository from Git repo via SSH.
+You should place your key at `./ssh_key`, or change volume in compose file.
 
-In this example we use `SSH key` that should be located in build folder
-under name of `ssh_key`.
-
-Add corresponding public key to your Deploy keys and edit `docker-compose.yaml`
-to use your repo URI.
+Add corresponding public key to your Deploy keys in repository settings
+and edit `docker-compose.yaml` to use your repo URI, branch or commit SHA
+if needed.
 
 To build the image use:
 
