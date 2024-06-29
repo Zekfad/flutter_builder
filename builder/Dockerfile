@@ -7,8 +7,8 @@ LABEL org.opencontainers.image.title="Flutter Builder"
 LABEL org.opencontainers.image.authors="zekfad@null.moe"
 LABEL org.opencontainers.image.licenses="ISC"
 LABEL org.opencontainers.image.source="https://github.com/Zekfad/flutter_builder"
-LABEL org.opencontainers.image.url ="https://github.com/Zekfad/flutter_builder/tree/master/builder"
-
+LABEL org.opencontainers.image.url="https://github.com/Zekfad/flutter_builder/tree/master/builder"
+LABEL org.opencontainers.image.description="Flutter Builder"
 
 # Env
 
