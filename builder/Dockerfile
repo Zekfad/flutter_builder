@@ -13,8 +13,6 @@ LABEL org.opencontainers.image.url ="https://github.com/Zekfad/flutter_builder/t
 # Env
 
 WORKDIR /root
-
-ENV ANDROID_SDK_URL="https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip"
 ENV FLUTTER_VERSION="stable"
 ENV ANDROID_SDK_ROOT="/root/android-sdk"
 ENV FLUTTER_SDK_ROOT="/root/flutter-sdk"
@@ -43,16 +41,6 @@ RUN flutter precache \
 	# && flutter update-packages
 
 
-# Install Android SDK
-
-RUN curl -Lo android_tools.zip $ANDROID_SDK_URL \
-	&& unzip -q -d $ANDROID_SDK_ROOT android_tools.zip \
-	&& rm -f android_tools.zip \
-	&& mkdir -p $ANDROID_SDK_ROOT/cmdline-tools/latest \
-	&& mv $ANDROID_SDK_ROOT/cmdline-tools/bin $ANDROID_SDK_ROOT/cmdline-tools/latest \
-	&& mv $ANDROID_SDK_ROOT/cmdline-tools/lib $ANDROID_SDK_ROOT/cmdline-tools/latest
-
-
 # Add Adoptium repository
 
 RUN curl -s -L https://packages.adoptium.net/artifactory/api/gpg/key/public \
@@ -72,16 +60,32 @@ ENV JAVA_VERSION="17"
 RUN apt-get install -y temurin-$JAVA_VERSION-jdk
 
 
+# Install Android SDK
+
+ENV ANDROID_SDK_URL="https://dl.google.com/android/repository/commandlinetools-linux-11479570_latest.zip"
+RUN curl -Lo android_tools.zip $ANDROID_SDK_URL \
+	&& unzip -q -d $ANDROID_SDK_ROOT android_tools.zip \
+	&& rm -f android_tools.zip \
+	&& mkdir -p $ANDROID_SDK_ROOT/cmdline-tools/latest \
+	&& mv $ANDROID_SDK_ROOT/cmdline-tools/bin $ANDROID_SDK_ROOT/cmdline-tools/latest \
+	&& mv $ANDROID_SDK_ROOT/cmdline-tools/lib $ANDROID_SDK_ROOT/cmdline-tools/latest
+
 # Install Android SDK packages
 
 # ENV ANDROID_PLATFORMS="\"platforms;android-28\" \"platforms;android-29\" \"platforms;android-30\" \"platforms;android-31\""
 # ENV ANDROID_BUILD_TOOLS="\"build-tools;28.0.3\" \"build-tools;29.0.3\" \"build-tools;30.0.3\" \"build-tools;31.0.0\""
 ENV ANDROID_PLATFORMS="\"platforms;android-34\""
-ENV ANDROID_BUILD_TOOLS="\"build-tools;34.0.0\""
+ENV ANDROID_BUILD_TOOLS="\"build-tools;30.0.3\" \"build-tools;34.0.0\""
+ENV ANDROID_NDK="\"ndk;26.3.11579264\""
 
-RUN yes "y" | eval "sdkmanager $ANDROID_BUILD_TOOLS" \
-	&& yes "y" | eval "sdkmanager $ANDROID_PLATFORMS" \
-	&& yes "y" | sdkmanager "platform-tools"
+RUN yes "y" | eval "sdkmanager $ANDROID_BUILD_TOOLS"
+RUN yes "y" | eval "sdkmanager $ANDROID_PLATFORMS"
+RUN yes "y" | eval "sdkmanager $ANDROID_NDK"
+RUN yes "y" | sdkmanager "emulator"
+RUN yes "y" | sdkmanager "platform-tools"
+RUN yes "y" | sdkmanager "tools"
+
+RUN sdkmanager --list_installed
 
 
 # Accept Android Licenses

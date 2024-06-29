@@ -20,9 +20,4 @@ RUN chmod -R +x /root/scripts/*
 # ENV REPO_BRANCH=master
 
 SHELL [ "/bin/bash", "-c" ]
-CMD source /root/scripts/fix-ssh-key-perms.sh \
-	&& /root/scripts/pull-repo.sh /root/repo \
-	&& source /root/scripts/fix-ssh-key-perms.sh remove-copy \
-	&& cd /root/repo \
-	&& flutter build apk \
-	&& cp -r build/app/outputs/flutter-apk/* /root/apk/
+CMD /root/scripts/do-build.sh
